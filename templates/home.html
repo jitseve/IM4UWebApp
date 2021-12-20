@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" type="text/css" href="../static/home.css"
+    </head>
+
+    <body>
+        <!-- Creating a result point that will work as soon as we give the input -->
+        <!-- method post makes sure that it is visible as in the python file -->
+        <form class="grid" action="/result" method="post">
+            <center>
+                <!-- inside the curly braces we can write python executable code -->
+                <!-- Todo: instead of getting the name and outputting that one, 
+                        we can output the figures of the filelocations that we get -->
+                {% if expnumber %}
+                <h3 style = "color: blue;">Figures for experiment {{expnumber}} will be returned</h3>
+                {% endif%}
+            </center>
+
+            <label for = 'Expnumber'>Enter experiment number:</label>
+            <input type="text" name="expnumber" id="expnumber">
+            <center><input type="submit" class="file_submit"></center>
+
+            
+        </form>
+
+        <div id="images">
+
+            <div id="box1">
+                {% if IMAGE1 %}
+                <img id="img1" src={{IMAGE1}} alt="Image Placeholder">
+                {% endif %}
+            </div>
+    
+            <div id="box2">
+                {% if IMAGE2 %}
+                <img id="img2" src={{IMAGE2}} alt="Image Placeholder">
+                {% endif %}
+            </div>
+    
+            <div id="box3">
+                {% if IMAGE3 %}
+                <img id="img3" src={{IMAGE3}} alt="Image Placeholder">                
+                {% endif %}
+            </div>
+
+        </div>
+
+    </body>
+</html>
