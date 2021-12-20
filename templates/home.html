@@ -8,22 +8,7 @@
     <body>
         <!-- Creating a result point that will work as soon as we give the input -->
         <!-- method post makes sure that it is visible as in the python file -->
-        <form class="grid" action="/result" method="post">
-            <center>
-                <!-- inside the curly braces we can write python executable code -->
-                <!-- Todo: instead of getting the name and outputting that one, 
-                        we can output the figures of the filelocations that we get -->
-                {% if expnumber %}
-                <h3 style = "color: blue;">Figures for experiment {{expnumber}} will be returned</h3>
-                {% endif%}
-            </center>
-
-            <label for = 'Expnumber'>Enter experiment number:</label>
-            <input type="text" name="expnumber" id="expnumber">
-            <center><input type="submit" class="file_submit"></center>
-
-            
-        </form>
+        <a href="{{url_for('upload_csv')}}"> Go to Upload</a>
 
         <div id="images">
 

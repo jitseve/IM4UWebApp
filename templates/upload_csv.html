@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="row">
+        <div class="column">
+
+            <h1> Upload file</h1>
+            <hr>
+
+
+            <form action="/upload_csv" method="POST" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label> Select csv</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" name="csv" id="csv">
+                        <label class="custom-file-label" for="csv">Select csv...</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Upload CSV</button>
+            </form>
+
+            <a href="{{url_for('result')}}"> Go to Result</a>
+
+        </div>
+    </div>
+</div>

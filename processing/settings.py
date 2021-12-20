@@ -4,7 +4,7 @@ class Settings(object):
     """
 
     # Readout settings
-    folderpath = '../temp_data'
+    folderpath = 'uploads'
     filetype = 'csv'
     subfolders = False
     experiment = 34
