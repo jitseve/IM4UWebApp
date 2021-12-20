@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" type="text/css" href="../static/upload.css">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    </head>
+
+    <body>
+        <nav>
+            <a href="{{url_for('home')}}"> Home </a>
+            <!-- Todo: actually have a tab to record data -->
+            <a href="#"> Record Data </a> 
+            <a href="{{url_for('upload_csv')}}" id="upload"> Upload Data </a>
+            <a href="{{url_for('result')}}">  Results </a>
+        </nav>
+
+        <form action="/upload_csv" method="POST" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" name="csv" id="csv">
+                    <label class="custom-file-label" for="csv">Select csv...</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Upload CSV</button>
+        </form>
+
+
+    </body>
+</html>

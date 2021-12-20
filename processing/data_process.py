@@ -12,7 +12,7 @@ class DataProcess(object):
     def __init__(self, storeddata): #TODO make everything that can be array an array
         self.gyro = [storeddata['gyrX'],storeddata['gyrY'],storeddata['gyrZ']]
         self.acc = [storeddata['accX'],storeddata['accY'],storeddata['accZ']]
-        self.time = storeddata['time_a'] 
+        self.time = storeddata['time'] 
 
         self.combAcc = []
         return

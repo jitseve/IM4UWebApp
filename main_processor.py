@@ -8,20 +8,20 @@ from processing.data_process import DataProcess
 from processing.dataplot import DataPlot
 
 
-def run(experimentnumber):
+def run():
     """
     ----------------- LOADING -----------------
     """
     Data = DataRead()
-    rawdata = Data.read(s.folderpath, filetype=s.filetype, subfolders=s.subfolders)
-    timestamps = rawdata[int(experimentnumber)]['time_a']
+    rawdata = Data.read(s.folderpath, filetype=s.filetype)
+    timestamps = rawdata['time']
 
 
 
     """
     ---------------- PROCESSING -------------------
     """
-    Data = DataProcess(rawdata[int(experimentnumber)])
+    Data = DataProcess(rawdata)
 
     combAcc = Data.combineAccelerations()
 
