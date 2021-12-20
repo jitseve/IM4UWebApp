@@ -20,6 +20,10 @@ nav a {
   margin-right: 25px;
 }
 
+#home {
+  color: #a88000;
+}
+
 .banner-area h2 {
   font-family: poppins;
   font-size: 65px;

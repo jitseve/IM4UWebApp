@@ -2,7 +2,7 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link rel="stylesheet" type="text/css" href="../static/result.css"
+        <link rel="stylesheet" type="text/css" href="../static/result.css">
     </head>
 
     <body>
@@ -13,28 +13,24 @@
             <a href="{{url_for('upload_csv')}}"> Upload Data </a>
             <a href="{{url_for('result')}}" id="result">  Results </a>
         </nav>
-        <a href="{{url_for('upload_csv')}}"> Go to Upload</a>
 
-        <div id="images">
 
-            <div id="box1">
-                {% if IMAGE1 %}
-                <img id="img1" src={{IMAGE1}} alt="Image Placeholder">
-                {% endif %}
-            </div>
-    
-            <div id="box2">
-                {% if IMAGE2 %}
-                <img id="img2" src={{IMAGE2}} alt="Image Placeholder">
-                {% endif %}
-            </div>
-    
-            <div id="box3">
-                {% if IMAGE3 %}
-                <img id="img3" src={{IMAGE3}} alt="Image Placeholder">                
-                {% endif %}
-            </div>
+        <div id="box1">
+            {% if IMAGE1 %}
+            <img id="img1" src={{IMAGE1}} alt="Image Placeholder">
+            {% endif %}
+        </div>
 
+        <div id="box2">
+            {% if IMAGE2 %}
+            <img id="img2" src={{IMAGE2}} alt="Image Placeholder">
+            {% endif %}
+        </div>
+
+        <div id="box3">
+            {% if IMAGE3 %}
+            <img id="img3" src={{IMAGE3}} alt="Image Placeholder">                
+            {% endif %}
         </div>
 
     </body>
