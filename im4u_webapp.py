@@ -4,24 +4,28 @@ import main_processor
 import os
 
 
-app = Flask(__name__) #Initializing app from flask class
+app = Flask(__name__)  # Initializing app from flask class
 app.secret_key = 'dljsaklqk24e21cjn!Ew@@dsa5'
 
-#Create set of routes (endpoints in website)
+# Create set of routes (endpoints in website)
+
+
 @app.route("/")
 @app.route("/home")
 def home():
     return render_template("home.html")
 
-#Todo: this might become different if on a server
+
+# Todo: this might become different if on a server
 app.config["CSV_UPLOADS"] = "/home/jitseve/Documents/q1-project_course/im4u_web/uploads"
 app.config["ALLOWED_EXTENSIONS"] = ["CSV", "JSON"]
 
-@app.route("/upload_csv", methods = ['GET', 'POST'])
+
+@app.route("/upload_csv", methods=['GET', 'POST'])
 def upload_csv():
 
     if request.method == "POST":
-        
+
         if request.files:
             csv = request.files["csv"]
 
@@ -37,24 +41,18 @@ def upload_csv():
                 filename = secure_filename(csv.filename)
                 csv.save(os.path.join(app.config["CSV_UPLOADS"], filename))
                 print("CSV saved")
-                result()
-                return render_template("home.html", IMAGE1=session['im1'],
-                                       IMAGE2=session['im2'], IMAGE3=session['im3'])
+                return redirect("/result")
 
     return render_template("upload_csv.html")
 
 
-@app.route("/result", methods = ['POST', 'GET'])
+@app.route("/result", methods=['POST', 'GET'])
 def result():
-    #Todo: run our python code here based on the name that we get in
-    #Todo: maybe output the name of the picture locations in the return
+    # Todo: run our python code here based on the name that we get in
+    # Todo: maybe output the name of the picture locations in the return
     im1, im2, im3 = main_processor.run()
-    session['im1'] = im1
-    session['im2'] = im2
-    session['im3'] = im3
 
-    return render_template("home.html", IMAGE1=im1, IMAGE2=im2, IMAGE3=im3)
-
+    return render_template("result.html", IMAGE1=im1, IMAGE2=im2, IMAGE3=im3)
 
 
 def allowed_file(filename):
@@ -67,7 +65,6 @@ def allowed_file(filename):
         return True
     else:
         return False
-
 
 
 if __name__ == '__main__':

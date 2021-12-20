@@ -2,35 +2,41 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link rel="stylesheet" type="text/css" href="../static/home.css"
+        <link rel="stylesheet" type="text/css" href="../static/home.css">
     </head>
 
     <body>
-        <!-- Creating a result point that will work as soon as we give the input -->
-        <!-- method post makes sure that it is visible as in the python file -->
-        <a href="{{url_for('upload_csv')}}"> Go to Upload</a>
+        <nav>
+            <a href="{{url_for('home')}}"> Home </a>
+            <!-- Todo: actually have a tab to record data -->
+            <a href="#"> Record Data </a> 
+            <a href="{{url_for('upload_csv')}}"> Upload Data </a>
+            <a href="{{url_for('result')}}"> Results </a>
+        </nav>
 
-        <div id="images">
-
-            <div id="box1">
-                {% if IMAGE1 %}
-                <img id="img1" src={{IMAGE1}} alt="Image Placeholder">
-                {% endif %}
+        <div class="banner-area">
+            <div class="text-area">
+                <h2>Banner Text</h2>
+                <a href="#" class="btn">Contact us</a>
             </div>
-    
-            <div id="box2">
-                {% if IMAGE2 %}
-                <img id="img2" src={{IMAGE2}} alt="Image Placeholder">
-                {% endif %}
+            <div class="logo-area">
+                <img src="/static/logo_new.png" alt="Logo">
             </div>
-    
-            <div id="box3">
-                {% if IMAGE3 %}
-                <img id="img3" src={{IMAGE3}} alt="Image Placeholder">                
-                {% endif %}
-            </div>
-
         </div>
 
+        <div class="footer-area">
+            <div class="f1">
+                <img src="/static/movesens_logo.png" alt="Logo Movesens">
+            </div>
+            <div class="f2">
+                <h3>Made by athletes <br> for athletes</h3>
+            </div>
+            <div class="f3">
+                <h3>Accurate <br> & Mobile</h3>
+            </div>
+            <div class="f4">
+                <h3>Some extra stuff</h3>
+            </div>
+        </div>
     </body>
 </html>
