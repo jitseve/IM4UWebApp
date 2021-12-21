@@ -13,24 +13,27 @@
             <a href="{{url_for('result')}}" > Results </a>
         </nav>
     
-        <div
-            style="background-color:red;color:white;height:20px;width:1008px;vertical-align: middle;text-align: center; font-family: monospace; font-size: large;">
-            <p>Raw data</p>
+        <div id="accData">
+            <div id="accTitle">
+                Acceleration Data
+            </div>
+            
+            <canvas id="AccCanvas" width="500" height="200"></canvas>
+
+        </div>
+        <div id="gyroData">
+            <div id="gyroTitle">
+                Gyro Data
+            </div>
+            
+            <canvas id="GyroCanvas" width="500" height="200"></canvas>
         </div>
         
-        <canvas id="AccCanvas" width="500" height="200"></canvas>
-        <canvas id="GyroCanvas" width="500" height="200"></canvas>
-        <div
-            style="background-color:blue;color:white;height:20px;width:502px;vertical-align: middle;text-align: center; font-family: monospace; font-size: large;">
-            <p>Processed data</p>
-        </div>
-        <canvas id="SensorFusion" width="500" height="200"></canvas>
         <p>
-            <button onclick="start()">Start sensor</button>
-            <button onclick="stop()">Stop sensor</button>
-            <button onclick="saveToFile()">Save to file</button>
-            <button onclick="changeDisplay()">Change Datatype</button>
-            <button onclick="changeRotation()">Change Rotation</button>
+            <button onclick="start()" id="btnStart">Start sensor</button>
+            <button onclick="stop()" id="btnStop">Stop sensor</button>
+            <button onclick="saveToFile()" id="saveToFile">Save to file</button>
+            <button onclick="process()" id="process">Process</button>
         </p>
 
 
@@ -42,21 +45,20 @@
  */ 
 
  // General variables
- var canvas, canvas2, canvas3, ctx, ctx2, ctx3, requestId;
+ var canvas, canvas2, ctx, ctx2, requestId;
  var xAcc = [];
  var yAcc = [];
  var zAcc = [];
  var xGyro = [];
  var yGyro = [];
  var zGyro = [];
- var combinedAccelerations = [];
- var rolls = [];
- var pitches = [];
- var yaws = [];
+ var accelerationX = [];
+ var accelerationY = [];
+ var accelerationZ = [];
+ var gyroscopeX = [];
+ var gyroscopeY = [];
+ var gyroscopeZ = [];
  var timeStamps = [];
- var canvas3_out1 = [];
- var canvas3_out2 = [];
- var canvas3_out3 = [];
  
  // Bluetooth variables
  let targetDevice = null;
@@ -67,55 +69,11 @@
 
  // Variables for 1A - General
  var gravity = 9.81;
- var CombAcc = 0;
- var CombAccF2 = 0;
- var CombAccF2Old = 0;
- var CombAccF1 = 0;
- var CombAccF1Old = 0;
 
- // Variabels for 1A - Cadence
  var date = new Date();
  var timestampFirst  = date.getTime();
  var oldTimestamp = timestampFirst;
  var OutputString = "Output";
-
- // Variables for extra "in depth" exercises
- var timestampHigh = timestampLow = timestamp1 = timestamp2 =0;
- var plotChooser = 1;
- var rotationChooser = 0;
-
- // Variables for 2A
- var xGyroOld = 0;
- var yGyroOld = 0;
- var zGyroOld = 0;
- var xAccOld = 100;
- var yAccOld = 100;
- var zAccOld = 100;
- 
- // Variables for 1B
- var accRoll = 0;
- var gyroRoll = 0;
- var comRoll = 0;
-
- var accPitch = 0;
- var gyroPitch = 0;
- var comPitch = 0;
-
- var accYaw = 0;
- var gyroYaw = 0;
- var comYaw = 0;
-
- // Variables for 1B in depth
- var P = 1;
- var K = 0;
- var R = 10;
- var Q = 1;
- var xOld = x = 0;
-
- /* 
- This section displays all the functions that the code
- will use to execute.
- */
 
  function onDataChanged(event) {
 
@@ -124,22 +82,10 @@
 
     // Event data is converted into 6 parameters. X, Y, Z of the Accelerometer and Gyro
     let value = event.target.value
-
-    let numOfSamples = (value.byteLength - 6) / (6*4);
-
-    /*
-       console.log('The Value:'+value);
-       console.log('byteLength:'+value.byteLength);
-       console.log('Number Of Samples:'+numOfSamples);
-    
-       var uint8View = new Uint8Array(value.buffer);
-       console.log("incoming data: ", uint8View);
-
-       let timestamp = value.getUint32(2, true);
-    */    
+    let numOfSamples = (value.byteLength - 6) / (6*4);   
     
     // The samling time is set under the function findPeriodCharacteristic to 52Hz
-    let dT = 1/52
+    let dT = 1/208
 
     let i = 0;
     for (i=0;i<numOfSamples;i++){
@@ -153,128 +99,26 @@
         // console.log('Acc:'+xAccNew+':'+yAccNew+':'+zAccNew);
         // console.log('Gyro:'+xGyroNew+':'+yGyroNew+':'+zGyroNew);
 
-        // 1A
-        
-        // 1A.1
-        CombAcc = Math.sqrt(Math.pow(xAccNew,2) + Math.pow(yAccNew, 2) + Math.pow(zAccNew,2)) - gravity;
-
-        // 1A.2
-        let alfa = 0.4;
-        CombAccF1 = alfa*CombAccF1Old + (1-alfa)*CombAcc;
-
-        // 1A.3          
-        if (CombAcc > CombAccF1Old){
-            alfa2 = 0.9;}
-        else{
-            alfa2 = 0.98;}
-
-        CombAccF2 = alfa2 * CombAccF2Old + (1-alfa2) * CombAcc;
-        
-
-        //EXTRA: Create lower limit to eliminate infinite cadance due to noise
-        var date = new Date();
-        currentTimestamp = date.getTime() - timestampFirst;
-
-        if ((CombAcc >= -2.5) && (CombAcc <= 2.5)){
-            timestampLow = date.getTime();}
-        else{
-            timestampHigh = date.getTime();}
-
-        let idlingThreshold = 1000;            //Threshold for cadence computation to go into idling mode (now 1000ms= 1s)
-        if ((timestampLow-timestampHigh < idlingThreshold) && timestampHigh!==0){
-            
-            // 1A.4
-            if ((CombAccF1 > CombAccF2) && (CombAccF1Old < CombAccF2Old)){
-                var date = new Date();
-                timestamp = date.getTime();
-                var cadence = (1000/(timestamp-oldTimestamp))*60;   //Cadence = steps per minute
-                if (plotChooser==0){console.log(precise(cadence, 6) +' steps per minute');}
-                oldTimestamp = timestamp;
-            }
-
-            // EXTRA: Create higher cadence limit to detect shaking
-            let cadenceThreshold = 200;
-
-            if (cadence<=cadenceThreshold){
-                timestamp1 = date.getTime();
-            }
-            else if (cadence>cadenceThreshold){
-                timestamp2 = date.getTime();
-                if ((timestamp2-timestamp1 >1000) && (plotChooser == 0)){
-                    console.log("----Movesense is being shaken----")
-                }
-            }
-        }
-        else{
-            console.log("----Movesense is in idling mode----")
-        }    
-
-        // 1B
-        //1B.1
-        accRoll = Math.atan(xAccNew/(Math.sqrt(Math.pow(yAccNew,2)+ Math.pow(zAccNew,2))))*180/Math.PI;
-        accPitch = Math.atan(yAccNew/(Math.sqrt(Math.pow(xAccNew,2)+Math.pow(zAccNew,2))))*180/Math.PI;
-        accYaw = Math.atan((Math.sqrt(Math.pow(yAccNew,2)+Math.pow(xAccNew,2)))/zAccNew)*180/Math.PI;
-
-        //1B.2
-        gyroRoll = gyroRoll + dT * yGyroNew;
-        gyroPitch = gyroPitch + dT * xGyroNew;
-        gyroYaw = gyroYaw + dT * zGyroNew;
-
-        //1B.3
-        let alfa3 = 0.67;
-        comRollOld = comRoll;
-        comRoll = (alfa3 * (comRollOld + dT*yGyroNew) + (1-alfa3)*accRoll);
-
-        comPitchOld = comPitch;
-        comPitch = (alfa3 * (comPitchOld + dT*xGyroNew) + (1-alfa3)*accPitch);
-
-        comYawOld = comYaw;
-        comYaw = (alfa3 * (comYawOld + dT*zGyroNew) + (1-alfa3)*accYaw);
-
-        //1B in depth | Kalmanfilter
-        kalRoll = kalmanFilter(accRoll);
-        console.log(kalRoll);
-
-
-        // Plot lines
-        if (plotChooser == 0){
-            OutputString = "Combined acceleration"
-            if (-100<(CombAcc*5)<100){   
-                // plotOnBlueLine(CombAcc*5);
-            }
-            plotOnGreenLine(CombAccF2*7)
-            plotOnRedLine(CombAccF1*7)
-        }
-        else if (plotChooser == 1 && rotationChooser == 0){
-            OutputString = "Rotation |Roll|"
-            plotOnBlueLine(accRoll);
-            plotOnGreenLine(gyroRoll);
-            plotOnRedLine(kalRoll);
-        }
-        else if (plotChooser == 1 && rotationChooser == 1){
-            OutputString = "Rotation |Pitch|"
-            plotOnBlueLine(accPitch);
-            plotOnGreenLine(gyroPitch);
-            plotOnRedLine(comPitch);
-        }
-        else if (plotChooser == 1 && rotationChooser == 2){
-            OutputString = "Rotation |Yaw|"
-            plotOnBlueLine(accYaw);
-            plotOnGreenLine(gyroYaw);
-            plotOnRedLine(comYaw);
-        }
-        else {
-            console.log("ERROR; NO display data CHOSEN")
-        }    
-
-        // Updating
-        CombAccF2Old = CombAccF2;
-        CombAccF1Old=CombAccF1;
         uppdateAccAndGyroCanvas(xAccNew,yAccNew,zAccNew,xGyroNew,yGyroNew,zGyroNew);
-        updateDynamicArrays(CombAcc, comRoll, comPitch, comYaw, currentTimestamp);
+        updateDynamicArrays(xAccNew, yAccNew, zAccNew, xGyroNew, yGyroNew, zGyroNew, currentTimestamp);
     }     
  }
 
+ function init(){
+    canvas = document.getElementById('AccCanvas');
+    ctx = canvas.getContext('2d');
+    canvas2 = document.getElementById('GyroCanvas');
+    ctx2 = canvas2.getContext('2d');
+    for(i=0; i < 250; i++){
+        xAcc.push(100);
+        yAcc.push(100);
+        zAcc.push(100);
+        xGyro.push(100);
+        yGyro.push(100);
+        zGyro.push(100);
+    }
+    console.log("init");
+ } 
 
  function uppdateAccAndGyroCanvas(xAccNew,yAccNew,zAccNew,xGyroNew,yGyroNew,zGyroNew){
      // Here the canvas is upptade with new raw data
@@ -292,55 +136,15 @@
       zGyro.push(100+(zGyroNew/4));
  }
 
-
- function init(){
-    canvas = document.getElementById('AccCanvas');
-    ctx = canvas.getContext('2d');
-    canvas2 = document.getElementById('GyroCanvas');
-    ctx2 = canvas2.getContext('2d');
-    canvas3 = document.getElementById('SensorFusion');
-    ctx3 = canvas3.getContext('2d');
-    for(i=0; i < 250; i++){
-        xAcc.push(100);
-        yAcc.push(100);
-        zAcc.push(100);
-        xGyro.push(100);
-        yGyro.push(100);
-        zGyro.push(100);
-        canvas3_out1.push(100);
-        canvas3_out2.push(100);
-        canvas3_out3.push(100);
-    }
-    console.log("init");
- } 
-
-
- function precise(x,a) {
-     // This is a function that rounds numbers(x) to whatever is inputted as a 
-    return Number.parseFloat(x).toPrecision(a);
- }
-
- function kalmanFilter(z){
-
-    K = (P +Q ) / ((P + Q) + R);
-    x = xOld + K * (z - xOld)
-    P = (1 - K * (P + Q))
-
-    xOld = x
-
-    return x
-
- }
-
-
- function updateDynamicArrays(acc, roll, pitch, yaw, time){
-     combinedAccelerations.push(acc);
-     rolls.push(roll);
-     pitches.push(pitch);
-     yaws.push(yaw);
+ function updateDynamicArrays(accX, accY, accZ, gyroX, gyroY, gyroZ, time){
+     accelerationX.push(accX)
+     accelerationY.push(accY)
+     accelerationZ.push(accZ)
+     gyroscopeX.push(gyroX)
+     gyroscopeY.push(gyroY)
+     gyroscopeZ.push(gyroZ)
      timeStamps.push(time);
  }
-
 
  function startBluetooth(){
     navigator.bluetooth.requestDevice({
@@ -363,7 +167,6 @@
     });
  }
 
-
  function findDataCharacteristic(service) {
   service.getCharacteristic(AccGyro_DATA)
     .then(characteristic => {
@@ -378,21 +181,6 @@
     });
  }
 
- function plotOnRedLine(newValue){
-    canvas3_out1.shift();
-      canvas3_out1.push(100+newValue); 
- }
-
- function plotOnBlueLine(newValue){
-  canvas3_out3.shift();
-    canvas3_out3.push(100+newValue);
- }
-
- function plotOnGreenLine(newValue){
-  canvas3_out2.shift();
-    canvas3_out2.push(100+newValue);    
- }
-
  function findPeriodCharacteristic(service) {
     //  Acceleromter = 100, IMU 9 = 900
     //  Change period 900 = 13Hz, 901 = 26Hz, 902 = 52Hz, 903 = 104Hz
@@ -400,8 +188,8 @@
     console.log("setData");
     service.getCharacteristic(AccGyro_PERDIO)
     .then(characteristic => {
-        //let dataResource = "/Meas/IMU6/52";
-        const val = new Uint8Array([1, 99, 47, 77, 101, 97, 115, 47, 73, 77, 85, 54, 47, 53, 50])
+        //let dataResource = "/Meas/IMU6/208";
+        const val = new Uint8Array([1, 99, 47, 77, 101, 97, 115, 47, 73, 77, 85, 54, 47, 50, 48, 56])
         //const val = new Uint8Array([2, 99]);
         characteristic.writeValue(val)
     })
@@ -414,8 +202,6 @@
    // Start the animation loop, targets 60 frames/s
    startBluetooth();
    requestId = requestAnimationFrame(animationLoop);
-
-   console.log("Initial data type is: " + plotChooser)
  }
 
  function stop() {
@@ -429,7 +215,6 @@
   //bluetoothCharacteristic.stopNotifications()
   targetDevice.gatt.disconnect();
  }
-
 
  function animationLoop(timestamp){
      //console.log("animate");
@@ -486,110 +271,27 @@
      for(foo = 0; foo < canvas2.width; foo++){
          ctx2.lineTo(foo*2,200-zGyro[foo]);
      }
-     ctx2.stroke();
-
-     ctx3.clearRect(0, 0, canvas3.width, canvas3.height);
-
-     ctx3.font = "12px Arial";
-     ctx3.fillStyle = "#000000";
-     ctx3.fillText(OutputString,5,12);
-
-     ctx3.strokeStyle = "#FF0000";
-     ctx3.beginPath(0,200-canvas3_out1[0]);
-     for(foo = 0; foo < canvas3.width; foo++){
-         ctx3.lineTo(foo*2,200-canvas3_out1[foo]);
-     }
-     ctx3.stroke();
-     
-     ctx3.strokeStyle = "#00FF00";
-     ctx3.beginPath(0,200-canvas3_out2[0]);
-     for(foo = 0; foo < canvas3.width; foo++){
-         ctx3.lineTo(foo*2,200-canvas3_out2[foo]);
-     }
-     ctx3.stroke();
-
-     ctx3.strokeStyle = "#0000FF";
-     ctx3.beginPath(0,200-canvas3_out3[0]);
-     for(foo = 0; foo < canvas3.width; foo++){
-         ctx3.lineTo(foo*2,200-canvas3_out3[foo]);
-     }
-     ctx3.stroke();
-     
+     ctx2.stroke();   
 
      requestId = requestAnimationFrame(animationLoop);
  }
  
- function changeDisplay(){
-     // Function for changing the displayed datatype
-     if (plotChooser == 0){
-         plotChooser = 1;
-         console.log("Now displaying gyro  (" + plotChooser + ") in roll mode (" +rotationChooser+ ")")
-     }
-     else if (plotChooser == 1){
-         plotChooser = 0;
-         console.log("Now displaying combined acceleration  (" + plotChooser + ")")
-     }
-     resetDisplay();
- }
-
- function resetDisplay(){
-     // Function to reset all the displayed values to 0
-     // 1st empty the current arrays
-    canvas3_out1 = [];
-    canvas3_out2 = [];
-    canvas3_out3 = [];
-
-    // push starting parameters in again
-    i=0
-    for(i=0; i < 250; i++){
-        canvas3_out1.push(100);
-        canvas3_out2.push(100);
-        canvas3_out3.push(100);
-    }
-
- }
-
- function changeRotation(){
-     if (plotChooser == 1){
-        if (rotationChooser == 0){
-            rotationChooser = 1;
-            console.log("Now displaying pitch ("+ rotationChooser + ")")
-        }
-        else if (rotationChooser == 1){
-            rotationChooser = 2;
-            console.log("Now displaying yaw ("+ rotationChooser + ")")
-        }
-        else if (rotationChooser == 2){
-            rotationChooser = 0;
-            console.log("Now displaying roll ("+ rotationChooser + ")")
-        }
-    }
-    else{
-        console.log("Not showing gyro data, nothing has changed")
-    }
- }
-
  function saveToFile(){
     var file;
     var properties = {type: 'application/json'}; // Specify the file's mime-type.
-    var myObj = {accX: xAcc, accY: yAcc, accZ: zAcc, magX: xGyro, magY: yGyro, magZ: xGyro};
-    var myObj2 = {Acceleration: combinedAccelerations, RollData: rolls, PitchData: pitches, YawData: yaws, TimeData: timeStamps};
+    var myObj = {accX: accelerationX, accY: accelerationY, accZ: accelerationZ,
+         gyrX: gyroscopeX, gyrY: gyroscopeY, gyrZ: gyroscopeZ};
     var myJSON = JSON.stringify(myObj);
-    var myJSON2 = JSON.stringify(myObj2);
     try {
         // Specify the filename using the File constructor, but ...
-        file = new File(myJSON, "6DOF.json", properties);
-        file2 = new File(myJSON2, "Dynamic_Data.json", properties)
+        file = new File(myJSON, "DATA_IMU6.json", properties);
     } catch (e) {
         // ... fall back to the Blob constructor if that isn't supported.
         file = new Blob([myJSON], {type: "application/json"});
-        file2 = new Blob([myJSON2],{type: "application/json"});
     }
     var a = document.createElement('a');
     a.href = window.URL.createObjectURL(file);
-    a.href = window.URL.createObjectURL(file2);
-    a.download = "6DOF.json";
-    a.download = "Dynamic_Data.json";
+    a.download = "DATA_IMU6.json";
     a.click();
  }
 

@@ -23,3 +23,7 @@ nav a {
 #recorddata {
   color: #a88000;
 }
+
+.accData {
+  border: 1px dashed #fff;
+}
