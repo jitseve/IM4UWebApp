@@ -67,5 +67,10 @@ def allowed_file(filename):
         return False
 
 
+@app.route('/recorddata')
+def recorddata():
+    return render_template("recorddata.html")
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
