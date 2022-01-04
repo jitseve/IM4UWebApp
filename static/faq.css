@@ -1,0 +1,85 @@
+body {
+  font-family: "Work Sans", sans-serif;
+}
+
+nav {
+  position: absolute;
+  width: 1000px;
+  left: 100px;
+  top: 30px;
+  bottom: 10px;
+}
+
+nav a {
+  text-decoration: none;
+  font-size: 20px;
+  color: #000;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-family: "Courier New", Courier, monospace;
+  margin-right: 25px;
+}
+
+#faq {
+  color: #a88000;
+}
+
+.faq-heading {
+  border-bottom: #777;
+  margin-top: 70px;
+  align-items: center;
+  text-align: center;
+  padding: 20px 60px;
+}
+
+.faq-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.hr-line {
+  width: 60%;
+  margin: auto;
+}
+
+.faq-page {
+  color: #444;
+  cursor: pointer;
+  padding: 30px 20px;
+  width: 60%;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+  margin: auto;
+}
+
+.faq-body {
+  margin: auto;
+  width: 50%;
+  padding: auto;
+}
+
+.active,
+.faq-page:hover {
+  background-color: #f9f9f9;
+}
+
+.faq-body {
+  padding: 0 18px;
+  background-color: white;
+  display: none;
+  overflow: hidden;
+}
+
+.faq-page::after {
+  content: "\02795";
+  font-size: 13px;
+  color: #777;
+  float: right;
+  margin-left: 5px;
+}
+
+.active::after {
+  content: "\2796";
+}

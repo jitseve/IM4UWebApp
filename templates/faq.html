@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name=" viewport" content="width=device-width, initial-scale = 1.0">
+        <title> IM4U FAQ </title>
+        <link href="https://fonts.googleapis.com/css2?family=Work+Sans&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../static/faq.css">
+
+    </head>
+
+    <body>
+        <nav>
+            <a href="{{url_for('home')}}"> Home </a>
+            <a href="{{url_for('recorddata')}}"> Record Data </a> 
+            <a href="{{url_for('upload_csv')}}"> Upload Data </a>
+            <a href="{{url_for('result')}}"> Results </a>
+            <a href="{{url_for('faq')}}" id="faq"> FAQ </a>
+            <a href="{{url_for('contact')}}"> Contact </a>
+        </nav>
+
+        <main>
+            <h1 class="faq-heading">Frequently Asked Questions</h1>
+            <section class="faq-container">
+                <div class="faq-one">
+                    <!-- faq question -->
+                    <h1 class="faq-page">What do I need to use IM4U WebApp?</h1>
+                    <!-- faq answer -->
+                    <div class="faq-body">
+                        <p>You need to be in possesion of a movesense inertial measurement unit. 
+                            These can be bought on movesense.com</p>
+                    </div>
+                </div>
+                <hr class="hr-line">
+                <div class="faq-two">
+                    <!-- faq question -->
+                    <h1 class="faq-page">What does IM4U do?</h1>
+                    <!-- faq answer -->
+                    <div class="faq-body">
+                        <p>Currently, using data from your movesense sensor we can indicate your step frequencey <br>
+                        Also we can determine your ground contact times during a sprint. All done with a single sensor on your shoe. </p>
+                    </div>
+                </div>
+                <hr class="hr-line">
+                <div class="faq-three">
+                    <!-- faq question -->
+                    <h1 class="faq-page">Question 3</h1>
+                    <!-- faq answer -->
+                    <div class="faq-body">
+                        <p>Some answer </p>
+                    </div>
+                </div>  
+        </main>
+
+        <script>
+            var faq = document.getElementsByClassName("faq-page");
+            var i;
+
+            for (i = 0; i < faq.length; i++){
+                faq[i].addEventListener("click", function(){
+                    this.classList.toggle("active");
+
+                    var body = this.nextElementSibling;
+                    if (body.style.display === "block"){
+                        body.style.display = "none";
+                    } else {
+                        body.style.display = "block"
+                    }
+                });
+            }
+        </script>
+
+    </body>
+</html>
