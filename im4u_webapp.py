@@ -55,6 +55,16 @@ def result():
     return render_template("result.html", IMAGE1=im1, IMAGE2=im2, IMAGE3=im3)
 
 
+@app.route("/faq")
+def faq():
+    return render_template("faq.html")
+
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+
 def allowed_file(filename):
     if not "." in filename:
         return False

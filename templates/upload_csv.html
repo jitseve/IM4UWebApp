@@ -10,10 +10,11 @@
     <body>
         <nav>
             <a href="{{url_for('home')}}"> Home </a>
-            <!-- Todo: actually have a tab to record data -->
             <a href="{{url_for('recorddata')}}"> Record Data </a> 
             <a href="{{url_for('upload_csv')}}" id="upload"> Upload Data </a>
             <a href="{{url_for('result')}}">  Results </a>
+            <a href="{{url_for('faq')}}"> FAQ </a>
+            <a href="{{url_for('contact')}}"> Contact </a>
         </nav>
 
         <form action="/upload_csv" method="POST" enctype="multipart/form-data">

@@ -11,12 +11,14 @@
             <a href="{{url_for('recorddata')}}"> Record Data </a> 
             <a href="{{url_for('upload_csv')}}"> Upload Data </a>
             <a href="{{url_for('result')}}"> Results </a>
+            <a href="{{url_for('faq')}}"> FAQ </a>
+            <a href="{{url_for('contact')}}"> Contact </a>
         </nav>
 
         <div class="banner-area">
             <div class="text-area">
                 <h2>We improve <br> your sprint!</h2>
-                <a href="#" class="btn">Contact us</a>
+                <a href="{{url_for('contact')}}" class="btn">Contact us</a>
             </div>
             <div class="logo-area">
                 <img src="/static/im4u-logo.png" alt="Logo">
