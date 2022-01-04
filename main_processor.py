@@ -24,11 +24,13 @@ def run():
 
     GCT, steps = Data.findGCT()
 
+    Freq, steps2 = Data.findFrequency()
+
     # Todo: Compute GCT DATA here
     # This is all for testing purposes now
-    steps2 = [1, 2, 3, 4, 5, 6, 7, 8]
+    # steps2 = [1, 2, 3, 4, 5, 6, 7, 8]
     # GCT = [0.250, 0.183, 0.133, 0.135, 0.178, 0.185, 0.200, 0.200]
-    Freq = [2.2, 1.83, 2.05, 1.8, 1.65, 1.58, 1.5, 1.48]
+    # Freq = [2.2, 1.83, 2.05, 1.8, 1.65, 1.58, 1.5, 1.48]
 
     # Todo: Compute step frequency here
 

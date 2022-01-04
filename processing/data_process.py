@@ -2,6 +2,8 @@ from sys import intern
 from typing import Type
 import numpy as np
 from math import factorial
+
+from numpy.core.numeric import indices
 from processing.settings import Settings as s
 from scipy.signal import find_peaks
 
@@ -35,7 +37,7 @@ class DataProcess(object):
         peaks_idx = self.findPeaks(noisy_signal)
         gct_list = self.gctFromPeaks(peaks_idx)
 
-        stepnumbers = list(range(1, gct_list.size + 1))
+        stepnumbers = list(range(1, len(gct_list) + 1))
 
         return gct_list, stepnumbers
 
@@ -111,3 +113,118 @@ class DataProcess(object):
 
     def gctFromPeaks(self, peaks_idx: list):
         return self.time[peaks_idx[1::2]] - self.time[peaks_idx[::2]]
+
+    def findFrequency(self):
+        peaks, valleys, indices = self.stepRegister()
+        averageStepFrequencies, singleStepFrequencies = self.findStepFrequency(
+            valleys)
+
+        stepnumbers = list(range(1, len(singleStepFrequencies)+1))
+
+        return singleStepFrequencies, stepnumbers
+
+    def stepRegister(self):
+        K0, alpha, W2, TH_pk, TH_s, TH, W1, TH_vy, = s.stepRegisterInit()
+
+        maxima = [[], []]
+        minima = [[], []]
+        indices = []
+
+        # * Valid valley detection
+        # 1. Minima detection
+        for i in range(1, len(self.combAcc)-1):
+            if ((self.combAcc[i] < self.combAcc[i+1]) and (self.combAcc[i] < self.combAcc[i-1]) and (self.combAcc[i] < TH_vy)):
+                minima[0].append(self.combAcc[i])
+                minima[1].append(self.time[i])
+                indices.append(i)
+
+            # 1. Maxima Detection
+            if ((self.combAcc[i] > self.combAcc[i+1]) and (self.combAcc[i] > self.combAcc[i-1]) and (self.combAcc[i] > TH_pk)):
+                maxima[0].append(self.combAcc[i])
+                maxima[1].append(self.time[i])
+
+        # . Adapt TH_PK threshold according to the maximum value and remove all the wrong maxima
+        TH_pk = max(maxima[0])*0.3  # TODO Choose the right value
+        ind = 0
+        while ind < len(maxima[0]):
+            if maxima[0][ind] <= TH_pk:
+                maxima[0].pop(ind)
+                maxima[1].pop(ind)
+
+                ind = ind
+            else:
+                ind += 1
+
+        # . Remove all the valleys before first peak
+        ind = 0
+        while (ind < len(minima[0])-1 and minima[1][ind] < maxima[1][0]):
+            if minima[1][ind] < maxima[1][0] and minima[1][ind+1] < maxima[1][0]:
+                minima[1].pop(ind)
+                minima[0].pop(ind)
+                indices.pop(ind)
+
+                ind = ind
+            else:
+                ind += 1
+
+        # 2. Single valley detection with temporal threshold constraint
+        for i in range(1, len(self.combAcc)-1):
+
+            t_i = self.time[i]
+            n = self.find_nearest(np.asarray(minima[1]), t_i)
+            t_n = minima[1][n]
+
+            if ((np.abs(t_i-t_n)) < TH_s):
+                if (minima[1][n]-minima[1][max(0, n-W2)]) == 0:
+                    Ki = K0
+                else:
+                    Ki = alpha*(minima[1][n]-minima[1][max(0, n-W2)])/W2
+            elif (np.abs(t_i - t_n) >= TH_s):
+                Ki = K0
+
+            # * Valid valley detection
+            Ki = max(Ki, K0)
+            if ((minima[1][max(n, 1)]-minima[1][max(n-1, 0)]) < Ki):
+                index = minima[0].index(
+                    max([minima[0][max(n, 1)], minima[0][max(n-1, 0)]]))
+                minima[0].pop(index)
+                minima[1].pop(index)
+                indices.pop(index)
+
+        j = 1
+        while j < len(maxima[0]):
+            if ((maxima[1][j]-maxima[1][j-1]) < K0):
+                if maxima[0][j] > maxima[0][j-1]:
+                    index = j-1     # Determine the index of the smallest peak
+                else:
+                    index = j
+                # Delete smallest peak
+                maxima[0].pop(index)
+                maxima[1].pop(index)
+                j = j
+            else:
+                j += 1
+
+        # Clean extra valleys
+        if len(minima[0]) >= 2 and len(maxima[0]) >= 1:
+            if minima[1][-1] > maxima[1][-1] and minima[1][-2] > maxima[1][-1]:
+                minima[0].pop()
+                minima[1].pop()
+                indices.pop()
+
+        return maxima, minima, indices
+
+    def find_nearest(self, array, value):
+        idx = (np.abs(array - value)).argmin()
+        return idx
+
+    def findStepFrequency(self, peaks):
+        stepFreq = []
+
+        for i in range(len(peaks[0]) - 1):
+            timeOneStep = (peaks[1][i+1] - peaks[1][i]) / 1000
+            stepFreq.append(1 / timeOneStep)
+
+        avgStepFreq = sum(stepFreq) / max(1, len(stepFreq))
+
+        return avgStepFreq, stepFreq
